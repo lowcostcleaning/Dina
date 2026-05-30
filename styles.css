@@ -611,6 +611,12 @@ body {
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 0 20px rgba(255, 42, 133, 0.1);
+    
+    /* Touch adjustments for mobile stability */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 .scanner-finger {
     width: 50px;
@@ -653,6 +659,10 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: center;
+    min-height: 48px; /* Reserves space for wrapped text so height is constant */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .detector-question-box {

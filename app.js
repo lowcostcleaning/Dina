@@ -593,6 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startScanning();
         });
         scannerPad.addEventListener('touchend', stopScanning);
+        scannerPad.addEventListener('touchcancel', stopScanning);
     }
 
     function startScanning() {

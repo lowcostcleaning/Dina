@@ -157,6 +157,32 @@ document.addEventListener('DOMContentLoaded', () => {
         { img: 'SaveInta.com_702670252_18586297342058209_9041956576166705422_n.jpg', title: 'Дина-Богиня', text: 'Впрочем, это твое стандартное состояние. Просто продолжай сиять и принимать комплименты!' }
     ];
 
+    // Detector Questions Array
+    const detectorQuestions = [
+        {
+            q: "Обещаешь ли ты тратить деньги на сумочки, спа и красивую одежду без чувства вины?",
+            options: [
+                { text: "ОБЕЩАЮ! Эстетика превыше всего.", isCorrect: true, comment: "Детектор: КРИСТАЛЬНАЯ ПРАВДА! Система полностью одобряет." },
+                { text: "Буду скромно откладывать каждую копеечку...", isCorrect: false }
+            ]
+        },
+        {
+            q: "Правда ли, что ты являешься главным генератором хорошего настроения для всех своих друзей?",
+            options: [
+                { text: "ЧИСТАЯ ПРАВДА! Свечусь ярче солнца.", isCorrect: true, comment: "Детектор: ПРАВДА! Твой вайб — это чистый позитив." },
+                { text: "Да нет, я тихий скромный котик...", isCorrect: false }
+            ]
+        },
+        {
+            q: "Обещаешь ли ты любить себя, баловать покупками и сиять ярче звезд в новом году жизни?",
+            options: [
+                { text: "ЕСТЕСТВЕННО, ДА!", isCorrect: true, comment: "Детектор: АБСОЛЮТНАЯ ИСТИНА! С днем рождения! 🎉" },
+                { text: "Нет, буду грустить на диване...", isCorrect: false }
+            ]
+        }
+    ];
+    let detectorQuestionIndex = 0;
+
     // Compliments Array for Generator
     const funnyCompliments = [
         "Дина, твоя харизма настолько мощная, что ею можно заряжать айфоны!",
@@ -400,8 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderQuizQuestion();
                     scrollToQuestTop();
                 } else {
-                    nextLevelBtn.classList.remove('hidden');
-                    nextLevelBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    questFeedbackPanel.classList.add('hidden');
+                    startQuestLevel(2);
                 }
             }, 2000);
         } else {
@@ -472,8 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderEmotionQuestion();
                     scrollToQuestTop();
                 } else {
-                    nextLevelBtn.classList.remove('hidden');
-                    nextLevelBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    questFeedbackPanel.classList.add('hidden');
+                    startQuestLevel(3);
                 }
             }, 2000);
         } else {
@@ -554,7 +580,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 feedbackTitle.innerText = "Фраза расшифрована!";
                 feedbackDesc.innerText = "«Дина самая очаровательная красотка в этой галактике и точка!» — И это абсолютная истина!";
                 lucide.createIcons();
-                nextLevelBtn.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    questFeedbackPanel.classList.add('hidden');
+                    startQuestLevel(4);
+                }, 2000);
             } else {
                 playSound('error');
                 showDialog("Сбой шифрования!", "Слова собраны в неверном порядке. Собери фразу, чтобы она звучала логично и приятно!");
@@ -573,14 +603,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LEVEL 4: LIE DETECTOR ---
     const scannerPad = document.getElementById('scanner-pad');
     const scannerStatus = document.getElementById('scanner-status');
-    const detectorYesBtn = document.getElementById('detector-yes-btn');
-    const detectorNoBtn = document.getElementById('detector-no-btn');
+    const detectorQuestionContainer = document.getElementById('detector-question-container');
+    const scannerContainerBox = document.getElementById('scanner-container-box');
+    const detectorLayoutBox = document.getElementById('detector-layout-box');
+    const detectorQText = document.getElementById('detector-q-text');
+    const detectorButtonsBox = document.getElementById('detector-buttons-box');
 
     function initLieDetector() {
         scannerStatus.innerText = "Удерживай палец на сканере (нажми и держи)";
         scannerPad.className = "fingerprint-btn";
-        detectorYesBtn.disabled = true;
-        detectorNoBtn.disabled = true;
+        scannerContainerBox.classList.remove('hidden');
+        detectorQuestionContainer.classList.add('hidden');
+        detectorLayoutBox.classList.remove('authenticated');
+        detectorQuestionIndex = 0;
         isScanning = false;
         
         // Setup Touch / Click events
@@ -606,11 +641,15 @@ document.addEventListener('DOMContentLoaded', () => {
         scanTimeout = setTimeout(() => {
             scannerPad.classList.remove('scanning');
             scannerPad.classList.add('scanned');
-            scannerStatus.innerText = "ЛИЧНОСТЬ ИДЕНТИФИЦИРОВАНА: ДИНА. Ответ разблокирован.";
+            scannerStatus.innerText = "ЛИЧНОСТЬ ИДЕНТИФИЦИРОВАНА: ДИНА.";
             playSound('success');
             
-            detectorYesBtn.disabled = false;
-            detectorNoBtn.disabled = false;
+            setTimeout(() => {
+                scannerContainerBox.classList.add('hidden');
+                detectorQuestionContainer.classList.remove('hidden');
+                detectorLayoutBox.classList.add('authenticated');
+                renderDetectorQuestion();
+            }, 1000);
             isScanning = false;
         }, 1500);
     }
@@ -624,23 +663,75 @@ document.addEventListener('DOMContentLoaded', () => {
         isScanning = false;
     }
 
-    detectorYesBtn.addEventListener('click', () => {
-        playSound('success');
-        questFeedbackPanel.classList.remove('hidden', 'wrong-answer');
-        feedbackIconBox.innerHTML = '<i data-lucide="check-circle" class="success-icon"></i>';
-        feedbackTitle.innerText = "ПРАВДА!";
-        feedbackDesc.innerText = "Детектор лжи показывает 100% искренности! Поздравляем, миссия пройдена.";
-        lucide.createIcons();
-        nextLevelBtn.classList.remove('hidden');
-    });
-
-    detectorNoBtn.addEventListener('click', () => {
-        playSound('error');
-        showDialog("ОШИБКА ДЕТЕКТОРА!", "Кого ты пытаешься обмануть? Скромность — это хорошо, но сиять тебе предписано судьбой. Выбери правильный ответ!");
+    function renderDetectorQuestion() {
+        const currentQ = detectorQuestions[detectorQuestionIndex];
+        detectorQText.innerText = currentQ.q;
+        detectorButtonsBox.innerHTML = '';
         
-        detectorNoBtn.classList.add('shake-anim');
-        setTimeout(() => detectorNoBtn.classList.remove('shake-anim'), 500);
-    });
+        currentQ.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.classList.add('btn', 'btn-choice');
+            btn.innerText = opt.text;
+            btn.addEventListener('click', () => handleDetectorAnswer(btn, opt));
+            detectorButtonsBox.appendChild(btn);
+        });
+    }
+
+    function handleDetectorAnswer(selectedBtn, option) {
+        const buttons = detectorButtonsBox.querySelectorAll('.btn-choice');
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        if (option.isCorrect) {
+            selectedBtn.classList.add('correct');
+            playSound('success');
+
+            questFeedbackPanel.classList.remove('hidden', 'wrong-answer');
+            feedbackIconBox.innerHTML = '<i data-lucide="check-circle" class="success-icon"></i>';
+            feedbackTitle.innerText = "ДЕТЕКТОР: ПРАВДА!";
+            feedbackDesc.innerText = option.comment;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                detectorQuestionIndex++;
+                if (detectorQuestionIndex < detectorQuestions.length) {
+                    questFeedbackPanel.classList.add('hidden');
+                    renderDetectorQuestion();
+                    scrollToQuestTop();
+                } else {
+                    questFeedbackPanel.classList.add('hidden');
+                    playSound('fanfare');
+                    triggerConfettiRain();
+                    
+                    setTimeout(() => {
+                        showScreen('screen-contests');
+                        initWheel();
+                        initTarotDeck();
+                    }, 1000);
+                }
+            }, 2000);
+        } else {
+            selectedBtn.classList.add('wrong');
+            playSound('error');
+
+            questFeedbackPanel.classList.remove('hidden');
+            questFeedbackPanel.classList.add('wrong-answer');
+            feedbackIconBox.innerHTML = '<i data-lucide="alert-triangle" class="error-icon"></i>';
+            feedbackTitle.innerText = "ДЕТЕКТОР: ЛОЖЬ!";
+            feedbackDesc.innerText = "Кого ты пытаешься обмануть? Отвечай честно!";
+            lucide.createIcons();
+
+            selectedBtn.classList.add('shake-anim');
+            setTimeout(() => selectedBtn.classList.remove('shake-anim'), 500);
+
+            setTimeout(() => {
+                buttons.forEach(b => {
+                    b.style.pointerEvents = 'auto';
+                    b.classList.remove('wrong');
+                });
+                questFeedbackPanel.classList.add('hidden');
+            }, 2000);
+        }
+    }
 
     // NEXT LEVEL BTN Action
     nextLevelBtn.addEventListener('click', () => {

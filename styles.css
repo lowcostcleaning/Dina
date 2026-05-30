@@ -336,6 +336,9 @@ body {
     opacity: 0;
     transform: translateY(20px);
 }
+.hidden {
+    display: none !important;
+}
 
 /* ================= SCREEN 1: INTRO DESIGN ================= */
 #screen-intro {
@@ -584,6 +587,10 @@ body {
     grid-template-columns: 1fr 1.5fr;
     gap: 40px;
     align-items: center;
+    transition: all 0.3s ease;
+}
+.detector-layout.authenticated {
+    grid-template-columns: 1fr;
 }
 @media (max-width: 650px) {
     .detector-layout {

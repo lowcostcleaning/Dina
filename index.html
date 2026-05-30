@@ -122,17 +122,17 @@
                 <!-- Quest Stage 4: Lie Detector -->
                 <div class="quest-stage hidden" id="stage-detector">
                     <p class="stage-instructions">Положи палец на виртуальный сканер и ответь на финальный вопрос.</p>
-                    <div class="detector-layout">
-                        <div class="scanner-container">
+                    <div class="detector-layout" id="detector-layout-box">
+                        <div class="scanner-container" id="scanner-container-box">
                             <div class="fingerprint-btn" id="scanner-pad">
                                 <i data-lucide="fingerprint" class="scanner-finger"></i>
                                 <div class="laser-line"></div>
                             </div>
                             <span class="scanner-status" id="scanner-status">Удерживай палец на сканере</span>
                         </div>
-                        <div class="detector-question-box" id="detector-question-container">
+                        <div class="detector-question-box hidden" id="detector-question-container">
                             <h3 class="detector-question" id="detector-q-text">Обещаешь ли ты любить себя, баловать покупками и сиять ярче звезд в новом году жизни?</h3>
-                            <div class="detector-buttons">
+                            <div class="detector-buttons" id="detector-buttons-box">
                                 <button class="btn btn-choice" id="detector-yes-btn">ЕСТЕСТВЕННО, ДА!</button>
                                 <button class="btn btn-choice" id="detector-no-btn">НЕТ, БУДУ СКРОМНИЧАТЬ</button>
                             </div>

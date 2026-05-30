@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДинаПортал 2026 | С Днем Рождения!</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Montserrat:ital,wght@0,300;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Sparkles Container -->
+    <div id="particle-container"></div>
+
+    <!-- Audio Synth Toggle (uses custom Web Audio API to create retro beeps/chimes) -->
+    <div class="audio-control" id="audio-toggle-btn" title="Включить/выключить звуковые эффекты">
+        <i data-lucide="volume-2"></i>
+        <span>Звуки: ВКЛ</span>
+    </div>
+
+    <!-- Top Progress Bar (Hidden on Intro, shown during quest) -->
+    <header class="main-header hidden" id="main-header">
+        <div class="header-logo">ДИНА<span>ФЕСТ</span></div>
+        <div class="quest-progress-container">
+            <span class="progress-label">Прогресс миссии: <span id="progress-percent">0%</span></span>
+            <div class="progress-track">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content-wrapper">
+        
+        <!-- ================= SCREEN 1: INTRO ================= -->
+        <section id="screen-intro" class="screen active">
+            <div class="intro-card glass">
+                <div class="avatar-ring-container">
+                    <div class="avatar-ring-glow"></div>
+                    <img src="SaveInta.com_703978277_18586297324058209_375413065061604416_n.jpg" alt="Дина" class="avatar-img">
+                </div>
+                <h1 class="main-title gradient-text">С Днем Рождения, Дина!</h1>
+                <p class="intro-subtitle">Добро пожаловать в секретный цифровой портал, созданный в честь твоего праздника. Чтобы получить главное поздравление, тебе предстоит пройти квест!</p>
+                <div class="intro-stats">
+                    <div class="stat-box">
+                        <span class="stat-val">100%</span>
+                        <span class="stat-desc">Харизма</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-val">∞</span>
+                        <span class="stat-desc">Эстетика</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-val">10/10</span>
+                        <span class="stat-desc">Вайб</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-glow" id="start-quest-btn">
+                    <span>ЗАПУСТИТЬ ДИНАФЕСТ ИМЕНИННИЦЫ</span>
+                    <i data-lucide="rocket"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 2: QUEST ================= -->
+        <section id="screen-quest" class="screen hidden">
+            <div class="quest-card glass">
+                <div class="quest-header">
+                    <span class="level-indicator" id="level-indicator">Уровень 1 из 4</span>
+                    <h2 class="quest-title" id="quest-title">Тест на Диноведение</h2>
+                </div>
+
+                <!-- Quest Stage 1: Dina-Quiz -->
+                <div class="quest-stage" id="stage-quiz">
+                    <p class="stage-instructions">Ответь на коварные вопросы о себе. Обмани систему или скажи чистую правду!</p>
+                    <div class="question-container" id="question-box">
+                        <!-- Questions injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Quest Stage 2: Guess the Emotion (Photo Match) -->
+                <div class="quest-stage hidden" id="stage-emotion">
+                    <p class="stage-instructions">Искусственный интеллект просканировал твою мимику. Угадай, о чем ты думала в этот момент!</p>
+                    <div class="emotion-game-layout">
+                        <div class="emotion-image-frame">
+                            <img id="emotion-img" src="SaveInta.com_702670252_18586297342058209_9041956576166705422_n.jpg" alt="Дина Эмоция">
+                        </div>
+                        <div class="emotion-options" id="emotion-options-box">
+                            <!-- Options injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quest Stage 3: Compliments Decryptor -->
+                <div class="quest-stage hidden" id="stage-decrypt">
+                    <p class="stage-instructions">Собери секретный код из комплиментов! Нажимай на слова в правильном порядке, чтобы составить фразу.</p>
+                    <div class="decrypt-game-layout">
+                        <div class="target-sentence-box" id="target-sentence">
+                            <!-- Clicked words go here -->
+                            <div class="placeholder-text">Нажимай на слова ниже...</div>
+                        </div>
+                        <div class="scrambled-words-container" id="scrambled-words">
+                            <!-- Scrambled words buttons go here -->
+                        </div>
+                        <div class="decrypt-controls">
+                            <button class="btn btn-secondary btn-sm" id="reset-decrypt-btn">
+                                <i data-lucide="rotate-ccw"></i> Сбросить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quest Stage 4: Lie Detector -->
+                <div class="quest-stage hidden" id="stage-detector">
+                    <p class="stage-instructions">Положи палец на виртуальный сканер и ответь на финальный вопрос.</p>
+                    <div class="detector-layout">
+                        <div class="scanner-container">
+                            <div class="fingerprint-btn" id="scanner-pad">
+                                <i data-lucide="fingerprint" class="scanner-finger"></i>
+                                <div class="laser-line"></div>
+                            </div>
+                            <span class="scanner-status" id="scanner-status">Удерживай палец на сканере</span>
+                        </div>
+                        <div class="detector-question-box" id="detector-question-container">
+                            <h3 class="detector-question" id="detector-q-text">Обещаешь ли ты любить себя, баловать покупками и сиять ярче звезд в новом году жизни?</h3>
+                            <div class="detector-buttons">
+                                <button class="btn btn-choice" id="detector-yes-btn">ЕСТЕСТВЕННО, ДА!</button>
+                                <button class="btn btn-choice" id="detector-no-btn">НЕТ, БУДУ СКРОМНИЧАТЬ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom feedback message & next level button -->
+                <div class="quest-feedback-panel hidden" id="quest-feedback">
+                    <div class="feedback-icon" id="feedback-icon-box">
+                        <i data-lucide="check-circle" class="success-icon"></i>
+                    </div>
+                    <div class="feedback-text-content">
+                        <h4 class="feedback-title" id="feedback-title">Отлично пройдено!</h4>
+                        <p class="feedback-desc" id="feedback-desc">Ты справилась с этим этапом.</p>
+                    </div>
+                    <button class="btn btn-primary" id="next-level-btn">
+                        <span>Далее</span>
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 3: CONTESTS ================= -->
+        <section id="screen-contests" class="screen hidden">
+            <h2 class="section-title gradient-text">Зона Развлечений и Конкурсов</h2>
+            <p class="section-subtitle">Супер-аттракционы запущены специально для тебя. Покрути колесо и узнай свой тотем!</p>
+
+            <div class="contests-grid">
+                <!-- Contest 1: Wheel of Wishes -->
+                <div class="contest-card-wrapper glass">
+                    <div class="card-header-icon">
+                        <i data-lucide="dribbble" class="header-icon"></i>
+                        <h3>Колесо Судьбоносных Пожеланий</h3>
+                    </div>
+                    <p class="contest-desc">Жми кнопку «Крутить» и узнай, какой подарок от Вселенной ждет тебя в этом году!</p>
+                    
+                    <div class="wheel-area">
+                        <div class="wheel-pointer">▼</div>
+                        <div class="wheel-outer">
+                            <canvas id="wheel-canvas" width="340" height="340"></canvas>
+                        </div>
+                        <button class="btn btn-primary btn-glow" id="spin-btn">КРУТИТЬ КОЛЕСО</button>
+                    </div>
+                    
+                    <div class="wheel-result-popup hidden" id="wheel-result">
+                        <span class="result-label">Вселенная говорит:</span>
+                        <div class="result-value" id="wheel-result-val">Пожизненный запас кофе</div>
+                    </div>
+                </div>
+
+                <!-- Contest 2: Totem Dina -->
+                <div class="contest-card-wrapper glass">
+                    <div class="card-header-icon">
+                        <i data-lucide="sparkles" class="header-icon"></i>
+                        <h3>Какая ты Дина сегодня?</h3>
+                    </div>
+                    <p class="contest-desc">Выбери одну из магических карт, чтобы узнать свое истинное тотемное состояние на этот день рождения!</p>
+                    
+                    <div class="tarot-deck" id="tarot-deck">
+                        <!-- 6 Tarot cards will be generated by JS -->
+                    </div>
+
+                    <div class="tarot-result-box hidden" id="tarot-result">
+                        <button class="btn btn-secondary btn-sm" id="reset-tarot-btn">
+                            <i data-lucide="refresh-cw"></i> Выбрать другую карту
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <button class="btn btn-primary btn-glow" id="to-cinema-btn">
+                    <span>ПЕРЕЙТИ В КИНОТЕАТР ИМ. ДИНЫ</span>
+                    <i data-lucide="film"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 4: CINEMA HALL ================= -->
+        <section id="screen-cinema" class="screen hidden">
+            <h2 class="section-title gradient-text">Кинотеатр им. Дины</h2>
+            <p class="section-subtitle">Эксклюзивный показ шедевров кинематографа с тобой в главной роли! Попкорн включен.</p>
+
+            <div class="cinema-room glass">
+                <div class="screen-glow-reflection"></div>
+                <div class="cinema-screen-border">
+                    <div class="cinema-screen-canvas">
+                        <video id="cinema-player" controls>
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                        <div class="cinema-placeholder-screen" id="cinema-placeholder">
+                            <i data-lucide="play-circle" class="huge-play-icon"></i>
+                            <span>Выберите фильм ниже для воспроизведения</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="movie-selector-grid">
+                    <!-- Movie Card 1 -->
+                    <div class="movie-card" data-video-src="SaveInta.com_AQMcT4G2OEb7G07mgRJ1a2gmip57ntrIl2D8IdT6vRzPHRborI_Xjf3rR0lv6hzrW_bJpITPFu3wDhIxbFnD4LBOeDwvkP8jqd-FNuU.mp4">
+                        <div class="movie-badge">Экшен</div>
+                        <h4>Серия 1: Взрывной Шарм</h4>
+                        <p class="movie-duration">Длительность: 15 сек</p>
+                        <div class="movie-rating"><i data-lucide="star"></i> 9.9/10</div>
+                        <div class="critic-quote">«Эстетика зашкаливает!» — Кинопоиск</div>
+                    </div>
+
+                    <!-- Movie Card 2 -->
+                    <div class="movie-card" data-video-src="SaveInta.com_AQP0UdIIOpUWBQfQ_EsEeZqMyWzoGCqY07YYi9KcxUzeeyo36VbAzTS6DUWEIZ3lRRUKxY8q-KvumBfjpKaDgGkP7ln9jce7X4h1WPU.mp4">
+                        <div class="movie-badge">Мелодрама</div>
+                        <h4>Серия 2: Королевский Вайб</h4>
+                        <p class="movie-duration">Длительность: 8 сек</p>
+                        <div class="movie-rating"><i data-lucide="star"></i> 10/10</div>
+                        <div class="critic-quote">«Лучшая женская роль года» — Тарантино</div>
+                    </div>
+
+                    <!-- Movie Card 3 -->
+                    <div class="movie-card" data-video-src="SaveInta.com_AQP0aQLcajENNA9YwFj4XaZmvkojYRfM3Xm3JurroxpEaKTrMd-dZChCnG_l-yUkjNTNRkMKSg-Ai1ewEWdgLphdaQzA0wgd1akHfhQ.mp4">
+                        <div class="movie-badge">Блокбастер</div>
+                        <h4>Серия 3: Легендарная Дина</h4>
+                        <p class="movie-duration">Длительность: 24 сек</p>
+                        <div class="movie-rating"><i data-lucide="star"></i> 9.8/10</div>
+                        <div class="critic-quote">«Визуальные эффекты реальны!» — Д. Кэмерон</div>
+                    </div>
+
+                    <!-- Movie Card 4 -->
+                    <div class="movie-card" data-video-src="SaveInta.com_AQPoPPC0g7SHYik4dxMwRqzYwvkkDU5TFzVnrT3ztgEdYwEX9y_hqNiNh2xa8WUR-dKsb-1UNbJmyR2AcrRZOPCKmzKhVZlxEtgLFiQ.mp4">
+                        <div class="movie-badge">Комедия</div>
+                        <h4>Серия 4: Чистый Позитив</h4>
+                        <p class="movie-duration">Длительность: 11 сек</p>
+                        <div class="movie-rating"><i data-lucide="star"></i> 10+++/10</div>
+                        <div class="critic-quote">«Я плакал от красоты этого кадра» — Спилберг</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <button class="btn btn-primary btn-glow" id="to-final-btn">
+                    <span>РАЗБЛОКИРОВАТЬ ГЛАВНОЕ ПОЗДРАВЛЕНИЕ</span>
+                    <i data-lucide="gift"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 5: FINAL GREETING ================= -->
+        <section id="screen-final" class="screen hidden">
+            <div class="celebration-layout">
+                <!-- Golden Diploma -->
+                <div class="diploma-frame glass" id="diploma-card">
+                    <div class="diploma-gold-border">
+                        <div class="diploma-header">
+                            <i data-lucide="award" class="diploma-gold-icon"></i>
+                            <h2 class="diploma-main-title">ПОЧЕТНЫЙ ДИПЛОМ</h2>
+                            <p class="diploma-subtitle">настоящим подтверждается, что</p>
+                        </div>
+                        
+                        <div class="diploma-body">
+                            <h1 class="diploma-name gradient-text">Дина</h1>
+                            <p class="diploma-declaration">официально признана самой очаровательной, эстетичной, харизматичной и неповторимой Именинницей Вселенной 2026 года!</p>
+                            
+                            <ul class="diploma-bullets">
+                                <li><i data-lucide="check" class="bullet-check"></i> Разрешается спать до полудня и ни о чем не жалеть.</li>
+                                <li><i data-lucide="check" class="bullet-check"></i> Предписывается покупать красивые вещи без повода.</li>
+                                <li><i data-lucide="check" class="bullet-check"></i> Обязуется радоваться каждому дню и сиять на все 100%!</li>
+                            </ul>
+                        </div>
+
+                        <div class="diploma-footer">
+                            <div class="diploma-seal">
+                                <div class="seal-inner">ДИНА-2026</div>
+                            </div>
+                            <div class="diploma-signature">
+                                <span class="sig-line">Вселенная Эстетики</span>
+                                <span class="sig-desc">Совет Галактики</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Message & Greeting Generator -->
+                <div class="final-greeting-text glass">
+                    <h2 class="gradient-text">С Днем Рождения, Дорогая!</h2>
+                    <p class="greeting-paragraph">
+                        Дина, этот сайт создан, чтобы напомнить тебе, насколько ты потрясающая, яркая и удивительная. Твоя улыбка освещает мир, а твоя страсть к прекрасному делает этот мир уютнее и лучше. 
+                    </p>
+                    <p class="greeting-paragraph">
+                        Пусть этот год принесет тебе миллион поводов для искреннего смеха, невероятные путешествия, море цветов и исполнение самых заветных желаний. Оставайся всегда такой же сногсшибательной!
+                    </p>
+
+                    <!-- Interactive Generator of Compliments for Dina -->
+                    <div class="interactive-wishes-box">
+                        <h4>Генератор мгновенного настроения:</h4>
+                        <div class="generator-screen" id="wishes-screen">
+                            «Нажми на кнопку ниже, чтобы сгенерировать эксклюзивный комплимент!»
+                        </div>
+                        <button class="btn btn-secondary btn-sm btn-glow" id="gen-wish-btn">
+                            <i data-lucide="sparkles"></i> Сгенерировать комплимент
+                        </button>
+                    </div>
+
+                    <div class="final-buttons-row">
+                        <button class="btn btn-primary" id="restart-app-btn">
+                            <i data-lucide="rotate-ccw"></i> Пройти заново
+                        </button>
+                        <button class="btn btn-secondary" id="print-diploma-btn">
+                            <i data-lucide="printer"></i> Распечатать диплом
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Custom Modal Dialog for Success/Failure warnings -->
+    <div class="custom-dialog-overlay hidden" id="dialog-overlay">
+        <div class="custom-dialog-box glass">
+            <h3 class="dialog-title" id="dialog-title">Сообщение</h3>
+            <p class="dialog-text" id="dialog-text">Текст сообщения...</p>
+            <button class="btn btn-primary btn-sm" id="dialog-close-btn">ОК</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
